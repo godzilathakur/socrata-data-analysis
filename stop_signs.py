@@ -10,12 +10,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hs:x:", ["street=", "xstreet="])
     except getopt.GetoptError:
-        print("stop_signs.py -s <street> -x <xstreet>")
+        print("stop_signs.py -s <street> optional:-x <xstreet>")
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == '-h':
-            print("stop_signs.py -s <street> -x <xstreet>")
+            print("stop_signs.py -s <street> optional:-x <xstreet>")
             sys.exit()
         elif opt in ("-s", "--street"):
             streetname = arg
@@ -49,9 +49,9 @@ def main(argv):
     else:
         intersection = results_df.loc[results_df.street == streetname]
 
-    print(streetname, x_streetname)
-    for p in intersection.point:
-        print(p)
+    for _, row in intersection.iterrows():
+        print(row.street + " X " + row.x_street)
+        print(row.point)
 
 
 if __name__ == "__main__":
