@@ -1,30 +1,58 @@
 import pandas as pd
 from sodapy import Socrata
-import geojson
-from pprint import pprint
+import sys
+import getopt
 
-# Unauthenticated client only works with public data sets. Note 'None'
-# in place of application token, and no username or password:
-client = Socrata("data.sfgov.org", None)
 
-# Example authenticated client (needed for non-public datasets):
-# client = Socrata(data.sfgov.org,
-#                  MyAppToken,
-#                  userame="user@example.com",
-#                  password="AFakePassword")
+def main(argv):
+    streetname = ''
+    x_streetname = ''
+    try:
+        opts, args = getopt.getopt(argv, "hs:x:", ["street=", "xstreet="])
+    except getopt.GetoptError:
+        print("stop_signs.py -s <street> -x <xstreet>")
+        sys.exit(2)
 
-# First 2000 results, returned as JSON from API / converted to Python list of
-# dictionaries by sodapy.
-results = client.get("4542-gpa3", limit=2000)
+    for opt, arg in opts:
+        if opt == '-h':
+            print("stop_signs.py -s <street> -x <xstreet>")
+            sys.exit()
+        elif opt in ("-s", "--street"):
+            streetname = arg
+        elif opt in ("-x", "--xstreet"):
+            x_streetname = arg
 
-# Convert to pandas DataFrame
-results_df = pd.DataFrame.from_records(results)
+    if streetname == '':
+        print("Need a valid streetname")
+        sys.exit()
 
-potrero_intersection = results_df.loc[(results_df.street == 'MARIPOSA')
-                                      & (results_df.x_street == 'HARRISON')]
-hunterspoint_intersection = results_df.loc[results_df.street == 'DONAHUE']
+    # Unauthenticated client only works with public data sets. Note 'None'
+    # in place of application token, and no username or password:
+    client = Socrata("data.sfgov.org", None)
 
-for p in potrero_intersection.point:
-    print(p)
-for p in hunterspoint_intersection.point:
-    print(p)
+    # Example authenticated client (needed for non-public datasets):
+    # client = Socrata(data.sfgov.org,
+    #                  MyAppToken,
+    #                  userame="user@example.com",
+    #                  password="AFakePassword")
+
+    # First 2000 results, returned as JSON from API / converted to Python list
+    # of dictionaries by sodapy.
+    results = client.get("4542-gpa3", limit=2000)
+
+    # Convert to pandas DataFrame
+    results_df = pd.DataFrame.from_records(results)
+
+    if x_streetname != '':
+        intersection = results_df.loc[(results_df.street == streetname)
+                                      & (results_df.x_street == x_streetname)]
+    else:
+        intersection = results_df.loc[results_df.street == streetname]
+
+    print(streetname, x_streetname)
+    for p in intersection.point:
+        print(p)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
