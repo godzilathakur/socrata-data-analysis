@@ -50,7 +50,9 @@ def main(argv):
         intersection = results_df.loc[results_df.street == streetname]
 
     for _, row in intersection.iterrows():
+        print("===================================")
         print(row.street + " X " + row.x_street)
+        print(row.direction, row.st_facing)
         print(row.point)
 
 
