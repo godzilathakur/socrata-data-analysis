@@ -1,0 +1,3 @@
+Socrata provides Python API for working with open, public space data hosted by
+data.sfgov.org. This repository provides simple utilities to access this data
+and print pertinent information such as Stop Signs.
